@@ -1,32 +1,32 @@
-# Worktree Rototill Implementation Plan
+# Worktree 翻新实现计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **对于 agent 工作者：** 必需子技能：使用 superpowers:subagent-driven-development（推荐）或 superpowers:executing-plans 来逐任务实现此计划。步骤使用复选框（`- [ ]`）语法进行跟踪。
 
-**Goal:** Make superpowers defer to native harness worktree systems when available, fall back to manual git worktrees when not, and fix three known finishing bugs.
+**目标：** 使 superpowers 在原生 harness worktree 系统可用时优先使用它们，不可用时回退到手动 git worktrees，并修复三个已知的完成阶段 bug。
 
-**Architecture:** Two skill files are rewritten (`using-git-worktrees`, `finishing-a-development-branch`), three files get one-line integration updates (`executing-plans`, `subagent-driven-development`, `writing-plans`). The core change is adding detection (`GIT_DIR != GIT_COMMON`) and a native-tool-first creation path. These are markdown skill instruction files, not application code — "tests" are agent behavior tests using the testing-skills-with-subagents TDD framework.
+**架构：** 重写两个技能文件（`using-git-worktrees`、`finishing-a-development-branch`），三个文件获得一行集成更新（`executing-plans`、`subagent-driven-development`、`writing-plans`）。核心更改是添加检测（`GIT_DIR != GIT_COMMON`）和原生工具优先的创建路径。这些是 markdown 技能指令文件，而非应用代码——"测试"是使用 testing-skills-with-subagents TDD 框架的 agent 行为测试。
 
-**Tech Stack:** Markdown (skill files), bash (test scripts), Claude Code CLI (`claude -p` for headless testing)
+**技术栈：** Markdown（技能文件）、bash（测试脚本）、Claude Code CLI（`claude -p` 用于无头测试）
 
-**Spec:** `docs/superpowers/specs/2026-04-06-worktree-rototill-design.md`
+**规范：** `docs/superpowers/specs/2026-04-06-worktree-rototill-design.md`
 
 ---
 
-### Task 1: GATE — TDD Validation of Step 1a (Native Tool Preference)
+### 任务 1：关卡 — 步骤 1a（原生工具偏好）的 TDD 验证
 
-Step 1a is the load-bearing assumption of the entire design. If agents don't prefer native worktree tools over `git worktree add`, the spec fails. Validate this FIRST, before touching any skill files.
+步骤 1a 是整个设计的承重假设。如果 agent 不优先使用原生 worktree 工具而非 `git worktree add`，规范就失败了。在接触任何技能文件之前**首先**验证这一点。
 
-**Files:**
-- Create: `tests/claude-code/test-worktree-native-preference.sh`
-- Read: `skills/using-git-worktrees/SKILL.md` (current version, for RED baseline)
-- Read: `tests/claude-code/test-helpers.sh` (for `run_claude`, `assert_contains`, etc.)
-- Read: `skills/writing-skills/testing-skills-with-subagents.md` (TDD framework)
+**文件：**
+- 创建：`tests/claude-code/test-worktree-native-preference.sh`
+- 读取：`skills/using-git-worktrees/SKILL.md`（当前版本，用于 RED 基线）
+- 读取：`tests/claude-code/test-helpers.sh`（用于 `run_claude`、`assert_contains` 等）
+- 读取：`skills/writing-skills/testing-skills-with-subagents.md`（TDD 框架）
 
-**This task is a gate.** If the GREEN phase fails after 2 REFACTOR iterations, STOP. Do not proceed to Task 2. Report back — the creation approach needs redesign.
+**此任务是一个关卡。** 如果在 2 次 REFACTOR 迭代后 GREEN 阶段仍然失败，停止。不要继续到任务 2。报告回去——创建方法需要重新设计。
 
-- [ ] **Step 1: Write the RED baseline test script**
+- [ ] **步骤 1：编写 RED 基线测试脚本**
 
-Create the test script that will run scenarios both WITHOUT and WITH the updated skill text. The RED phase runs against the current skill (which has no Step 1a).
+创建测试脚本，该脚本将在**没有**和**有**更新后技能文本两种情况下运行场景。RED 阶段针对当前技能（没有步骤 1a）运行。
 
 ```bash
 #!/usr/bin/env bash
@@ -141,17 +141,17 @@ echo ""
 echo "=== Test Complete ==="
 ```
 
-- [ ] **Step 2: Run RED phase — confirm agent uses git worktree add today**
+- [ ] **步骤 2：运行 RED 阶段 — 确认 agent 今天使用 git worktree add**
 
-Run: `cd tests/claude-code && bash test-worktree-native-preference.sh red`
+运行：`cd tests/claude-code && bash test-worktree-native-preference.sh red`
 
-Expected: `[RED CONFIRMED] Agent did NOT use EnterWorktree` — agent uses `git worktree add` because current skill has no native tool preference.
+预期：`[RED CONFIRMED] Agent did NOT use EnterWorktree` — agent 使用 `git worktree add`，因为当前技能没有原生工具偏好。
 
-Document the agent's exact output and any rationalizations verbatim. This is the baseline failure the skill must fix.
+逐字记录 agent 的确切输出和任何合理化解释。这是技能必须修复的基线失败。
 
-- [ ] **Step 3: If RED confirmed, proceed. Write the Step 1a skill text.**
+- [ ] **步骤 3：如果 RED 确认，继续。编写步骤 1a 技能文本。**
 
-Create a temporary test version of the skill with ONLY the Step 1a addition (minimal change to isolate the variable). Add this section to the top of the skill's creation instructions, BEFORE the existing directory selection process:
+创建技能的一个临时测试版本，仅包含步骤 1a 添加（最小更改以隔离变量）。将此部分添加到技能创建指令的顶部，在现有目录选择流程之前：
 
 ```markdown
 ## Step 1: Create Isolated Workspace
@@ -169,23 +169,23 @@ After using a native tool, skip to Step 3 (Project Setup).
 If no native tool is available, create a worktree manually using git.
 ```
 
-- [ ] **Step 4: Run GREEN phase — confirm agent now uses EnterWorktree**
+- [ ] **步骤 4：运行 GREEN 阶段 — 确认 agent 现在使用 EnterWorktree**
 
-Run: `cd tests/claude-code && bash test-worktree-native-preference.sh green`
+运行：`cd tests/claude-code && bash test-worktree-native-preference.sh green`
 
-Expected: `[PASS] Agent used native EnterWorktree tool`
+预期：`[PASS] Agent used native EnterWorktree tool`
 
-If FAIL: Document the agent's exact output and rationalizations. This is a REFACTOR signal — the Step 1a text needs revision. Try up to 2 REFACTOR iterations. If still failing after 2 iterations, STOP and report back.
+如果失败：逐字记录 agent 的确切输出和合理化解释。这是一个 REFACTOR 信号——步骤 1a 文本需要修订。最多尝试 2 次 REFACTOR 迭代。如果在 2 次迭代后仍然失败，停止并报告回去。
 
-- [ ] **Step 5: Run PRESSURE phase — confirm agent resists fallback under pressure**
+- [ ] **步骤 5：运行 PRESSURE 阶段 — 确认 agent 在压力下抵抗回退**
 
-Run: `cd tests/claude-code && bash test-worktree-native-preference.sh pressure`
+运行：`cd tests/claude-code && bash test-worktree-native-preference.sh pressure`
 
-Expected: `[PASS] Agent used native tool even under time pressure`
+预期：`[PASS] Agent used native tool even under time pressure`
 
-If FAIL: Document rationalizations verbatim. Add explicit counters to Step 1a text (e.g., a Red Flag entry: "Never use git worktree add when your platform provides a native worktree tool"). Re-run.
+如果失败：逐字记录合理化解释。向步骤 1a 文本添加明确的计数器（例如，一个红旗条目："当你的平台提供原生 worktree 工具时，永远不要使用 git worktree add"）。重新运行。
 
-- [ ] **Step 6: Commit test script**
+- [ ] **步骤 6：提交测试脚本**
 
 ```bash
 git add tests/claude-code/test-worktree-native-preference.sh
@@ -197,18 +197,18 @@ git worktree add on Claude Code. Must pass before skill rewrite."
 
 ---
 
-### Task 2: Rewrite `using-git-worktrees` SKILL.md
+### 任务 2：重写 `using-git-worktrees` SKILL.md
 
-Full rewrite of the creation skill. Replaces the existing file entirely.
+完全重写创建技能。完全替换现有文件。
 
-**Files:**
-- Modify: `skills/using-git-worktrees/SKILL.md` (full rewrite, 219 lines → ~210 lines)
+**文件：**
+- 修改：`skills/using-git-worktrees/SKILL.md`（完全重写，219 行 → ~210 行）
 
-**Depends on:** Task 1 GREEN passing.
+**依赖于：** 任务 1 GREEN 通过。
 
-- [ ] **Step 1: Write the complete new SKILL.md**
+- [ ] **步骤 1：编写完整的新的 SKILL.md**
 
-Replace the entire contents of `skills/using-git-worktrees/SKILL.md` with:
+将 `skills/using-git-worktrees/SKILL.md` 的全部内容替换为：
 
 ```markdown
 ---
@@ -449,13 +449,13 @@ Ready to implement <feature-name>
 - **finishing-a-development-branch** - REQUIRED for cleanup after work complete
 ```
 
-- [ ] **Step 2: Verify the file reads correctly**
+- [ ] **步骤 2：验证文件读取正确**
 
-Run: `wc -l skills/using-git-worktrees/SKILL.md`
+运行：`wc -l skills/using-git-worktrees/SKILL.md`
 
-Expected: Approximately 200-220 lines. Scan for any markdown formatting issues.
+预期：约 200-220 行。检查是否有任何 markdown 格式问题。
 
-- [ ] **Step 3: Commit**
+- [ ] **步骤 3：提交**
 
 ```bash
 git add skills/using-git-worktrees/SKILL.md
@@ -471,16 +471,16 @@ Platform-neutral instruction file references (#1049)"
 
 ---
 
-### Task 3: Rewrite `finishing-a-development-branch` SKILL.md
+### 任务 3：重写 `finishing-a-development-branch` SKILL.md
 
-Full rewrite of the finishing skill. Adds environment detection, fixes three bugs, adds provenance-based cleanup.
+完全重写完成技能。添加环境检测，修复三个 bug，添加基于来源的清理。
 
-**Files:**
-- Modify: `skills/finishing-a-development-branch/SKILL.md` (full rewrite, 201 lines → ~220 lines)
+**文件：**
+- 修改：`skills/finishing-a-development-branch/SKILL.md`（完全重写，201 行 → ~220 行）
 
-- [ ] **Step 1: Write the complete new SKILL.md**
+- [ ] **步骤 1：编写完整的新的 SKILL.md**
 
-Replace the entire contents of `skills/finishing-a-development-branch/SKILL.md` with:
+将 `skills/finishing-a-development-branch/SKILL.md` 的全部内容替换为：
 
 ```markdown
 ---
@@ -743,13 +743,13 @@ git worktree prune  # Self-healing: clean up any stale registrations
 - **using-git-worktrees** - Cleans up worktree created by that skill
 ```
 
-- [ ] **Step 2: Verify the file reads correctly**
+- [ ] **步骤 2：验证文件读取正确**
 
-Run: `wc -l skills/finishing-a-development-branch/SKILL.md`
+运行：`wc -l skills/finishing-a-development-branch/SKILL.md`
 
-Expected: Approximately 210-230 lines.
+预期：约 210-230 行。
 
-- [ ] **Step 3: Commit**
+- [ ] **步骤 3：提交**
 
 ```bash
 git add skills/finishing-a-development-branch/SKILL.md
@@ -766,58 +766,58 @@ Stale worktree pruning after removal (git worktree prune)"
 
 ---
 
-### Task 4: Integration Updates
+### 任务 4：集成更新
 
-One-line changes to three files that reference `using-git-worktrees`.
+三个引用 `using-git-worktrees` 的文件各有一行更改。
 
-**Files:**
-- Modify: `skills/executing-plans/SKILL.md:68`
-- Modify: `skills/subagent-driven-development/SKILL.md:268`
-- Modify: `skills/writing-plans/SKILL.md:16`
+**文件：**
+- 修改：`skills/executing-plans/SKILL.md:68`
+- 修改：`skills/subagent-driven-development/SKILL.md:268`
+- 修改：`skills/writing-plans/SKILL.md:16`
 
-- [ ] **Step 1: Update executing-plans integration line**
+- [ ] **步骤 1：更新 executing-plans 集成行**
 
-In `skills/executing-plans/SKILL.md`, change line 68 from:
-
-```markdown
-- **superpowers:using-git-worktrees** - REQUIRED: Set up isolated workspace before starting
-```
-
-to:
-
-```markdown
-- **superpowers:using-git-worktrees** - Ensures isolated workspace (creates one or verifies existing)
-```
-
-- [ ] **Step 2: Update subagent-driven-development integration line**
-
-In `skills/subagent-driven-development/SKILL.md`, change line 268 from:
+在 `skills/executing-plans/SKILL.md` 中，将第 68 行从：
 
 ```markdown
 - **superpowers:using-git-worktrees** - REQUIRED: Set up isolated workspace before starting
 ```
 
-to:
+改为：
 
 ```markdown
 - **superpowers:using-git-worktrees** - Ensures isolated workspace (creates one or verifies existing)
 ```
 
-- [ ] **Step 3: Update writing-plans context line**
+- [ ] **步骤 2：更新 subagent-driven-development 集成行**
 
-In `skills/writing-plans/SKILL.md`, change line 16 from:
+在 `skills/subagent-driven-development/SKILL.md` 中，将第 268 行从：
+
+```markdown
+- **superpowers:using-git-worktrees** - REQUIRED: Set up isolated workspace before starting
+```
+
+改为：
+
+```markdown
+- **superpowers:using-git-worktrees** - Ensures isolated workspace (creates one or verifies existing)
+```
+
+- [ ] **步骤 3：更新 writing-plans 上下文行**
+
+在 `skills/writing-plans/SKILL.md` 中，将第 16 行从：
 
 ```markdown
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 ```
 
-to:
+改为：
 
 ```markdown
 **Context:** If working in an isolated worktree, it should have been created via the using-git-worktrees skill at execution time.
 ```
 
-- [ ] **Step 4: Commit all three**
+- [ ] **步骤 4：全部三个一起提交**
 
 ```bash
 git add skills/executing-plans/SKILL.md skills/subagent-driven-development/SKILL.md skills/writing-plans/SKILL.md
@@ -830,54 +830,54 @@ Fix stale 'created by brainstorming' claim in writing-plans."
 
 ---
 
-### Task 5: End-to-End Validation
+### 任务 5：端到端验证
 
-Verify the full rewritten skills work together. Run the existing test suite plus manual verification.
+验证完全重写的技能协同工作。运行现有测试套件加手动验证。
 
-**Files:**
-- Read: `tests/claude-code/run-skill-tests.sh`
-- Read: `skills/using-git-worktrees/SKILL.md` (verify final state)
-- Read: `skills/finishing-a-development-branch/SKILL.md` (verify final state)
+**文件：**
+- 读取：`tests/claude-code/run-skill-tests.sh`
+- 读取：`skills/using-git-worktrees/SKILL.md`（验证最终状态）
+- 读取：`skills/finishing-a-development-branch/SKILL.md`（验证最终状态）
 
-- [ ] **Step 1: Run existing test suite**
+- [ ] **步骤 1：运行现有测试套件**
 
-Run: `cd tests/claude-code && bash run-skill-tests.sh`
+运行：`cd tests/claude-code && bash run-skill-tests.sh`
 
-Expected: All existing tests pass. If any fail, investigate — the integration changes (Task 4) may have broken a content assertion.
+预期：所有现有测试通过。如果任何失败，调查——集成更改（任务 4）可能破坏了内容断言。
 
-- [ ] **Step 2: Re-run Step 1a GREEN test**
+- [ ] **步骤 2：重新运行步骤 1a GREEN 测试**
 
-Run: `cd tests/claude-code && bash test-worktree-native-preference.sh green`
+运行：`cd tests/claude-code && bash test-worktree-native-preference.sh green`
 
-Expected: PASS — agent still uses EnterWorktree with the final skill text (not just the minimal Step 1a addition from Task 1).
+预期：通过——agent 仍然使用最终的技能文本（不仅仅是任务 1 中的最小步骤 1a 添加）来使用 EnterWorktree。
 
-- [ ] **Step 3: Manual verification — read both rewritten skills end-to-end**
+- [ ] **步骤 3：手动验证——端到端读取两个重写的技能**
 
-Read `skills/using-git-worktrees/SKILL.md` and `skills/finishing-a-development-branch/SKILL.md` in their entirety. Check:
+完整读取 `skills/using-git-worktrees/SKILL.md` 和 `skills/finishing-a-development-branch/SKILL.md`。检查：
 
-1. No references to old behavior (hardcoded `CLAUDE.md`, interactive directory prompt, "REQUIRED" language)
-2. Step numbering is consistent within each file
-3. Quick Reference tables match the prose
-4. Integration sections cross-reference correctly
-5. No markdown formatting issues
+1. 没有对旧行为的引用（硬编码的 `CLAUDE.md`、交互式目录提示、"REQUIRED" 语言）
+2. 每个文件内的步骤编号一致
+3. 快速参考表与正文匹配
+4. 集成部分交叉引用正确
+5. 没有 markdown 格式问题
 
-- [ ] **Step 4: Verify git status is clean**
+- [ ] **步骤 4：验证 git 状态是干净的**
 
-Run: `git status`
+运行：`git status`
 
-Expected: Clean working tree. All changes committed across Tasks 1-4.
+预期：工作树干净。所有更改已在任务 1-4 中提交。
 
-- [ ] **Step 5: Final commit if any fixups needed**
+- [ ] **步骤 5：如果需要修复，进行最终提交**
 
-If manual verification found issues, fix them and commit:
+如果手动验证发现问题，修复它们并提交：
 
 ```bash
 git add -A
 git commit -m "fix: address review findings in worktree skill rewrite (PRI-974)"
 ```
 
-If no issues found, skip this step.
+如果没有发现问题，跳过此步骤。
 
 ---
 
-[← Back to main README](../../../README.md) · [📋 中文版 →](../../zh-CN/superpowers/plans/2026-04-06-worktree-rototill.md)
+[← 返回主 README](../../../../README.md) · [English Version](../../../superpowers/plans/2026-04-06-worktree-rototill.md)

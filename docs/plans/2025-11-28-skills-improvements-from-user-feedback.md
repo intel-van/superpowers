@@ -709,3 +709,7 @@ How do we know these improvements work?
 - Implementer-fix workflow change needs careful evaluation
 
 These changes address real problems documented by users while minimizing risk of making skills worse.
+
+---
+
+[← Back to main README](../../README.md) · [📋 中文版 →](../zh-CN/plans/2025-11-28-skills-improvements-from-user-feedback.md)

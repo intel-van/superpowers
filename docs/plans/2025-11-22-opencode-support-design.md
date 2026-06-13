@@ -292,3 +292,7 @@ superpowers/
 - **Extensibility**: Easy to add future platforms (Cursor, Windsurf, etc.)
 - **Native integration**: Uses OpenCode's plugin system properly
 - **Consistency**: Same skill experience across all platforms
+
+---
+
+[← Back to main README](../../README.md) · [📋 中文版 →](../zh-CN/plans/2025-11-22-opencode-support-design.md)

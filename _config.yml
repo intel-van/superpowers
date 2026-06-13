@@ -1,0 +1,12 @@
+# GitHub Pages 配置
+title: Superpowers
+description: A complete software development methodology for your coding agents, built on composable skills.
+markdown: GFM
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: true
+include:
+  - docs/
+  - docs/zh-CN/

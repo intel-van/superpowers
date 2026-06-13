@@ -134,3 +134,7 @@ Tasks and steps use checkbox syntax:
 **Modified files:**
 - `skills/brainstorming/SKILL.md` - add review loop after spec written
 - `skills/writing-plans/SKILL.md` - add chunk-by-chunk review loop, update task syntax examples
+
+---
+
+[← Back to main README](../../../README.md) · [📋 中文版 →](../../zh-CN/superpowers/specs/2026-01-22-document-review-system-design.md)

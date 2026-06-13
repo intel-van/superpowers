@@ -116,3 +116,7 @@ Debounce per-filename with ~100ms timeout to prevent duplicate events (common on
 **Unit tests** (`ws-protocol.test.js`): Test WebSocket frame encoding/decoding, handshake computation, and protocol edge cases directly by requiring `server.js` exports.
 
 **Integration tests** (`server.test.js`): Test full server behavior — HTTP serving, WebSocket communication, file watching, brainstorming workflow. Uses `ws` npm package as a test-only client dependency (not shipped to end users).
+
+---
+
+[← Back to main README](../../../README.md) · [📋 中文版 →](../../zh-CN/superpowers/specs/2026-03-11-zero-dep-brainstorm-server-design.md)

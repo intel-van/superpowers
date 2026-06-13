@@ -242,3 +242,7 @@ If a third skill needs the same detection pattern, extract it into a shared `ref
 - Existing Claude Code skill-triggering tests still pass
 - Existing subagent-driven-development integration tests still pass
 - Normal Claude Code session: full worktree creation + 4-option finishing still works
+
+---
+
+[← Back to main README](../../../README.md) · [📋 中文版 →](../../zh-CN/superpowers/specs/2026-03-23-codex-app-compatibility-design.md)

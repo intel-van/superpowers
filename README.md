@@ -1,3 +1,5 @@
+[![中文](https://img.shields.io/badge/lang-zh--CN-red)](README.zh-CN.md)
+
 # Superpowers
 
 Superpowers is a complete software development methodology for your coding agents, built on top of a set of composable skills and some initial instructions that make sure your agent uses them.
@@ -203,6 +205,23 @@ already use it in another harness.
 - **Evidence over claims** - Verify before declaring success
 
 Read [the original release announcement](https://blog.fsck.com/2025/10/09/superpowers/).
+
+## Further Reading
+
+- [OpenCode Integration Guide](docs/README.opencode.md) — Install and use Superpowers with OpenCode.ai
+- [Testing Guide](docs/testing.md) — How to test Superpowers skills
+- [Cross-Platform Polyglot Hooks](docs/windows/polyglot-hooks.md) — Windows/macOS/Linux hook support
+- [Implementation Plans](docs/plans/) — Development plans for past features
+- [Design Specs](docs/superpowers/specs/) — Design documents for past features
+- [Chinese Documentation](README.zh-CN.md) — 中文文档
+
+### Internal Design Documents
+
+- [Document Review System](docs/superpowers/specs/2026-01-22-document-review-system-design.md)
+- [Visual Brainstorming Refactor](docs/superpowers/specs/2026-02-19-visual-brainstorming-refactor-design.md)
+- [Zero-Dependency Brainstorm Server](docs/superpowers/specs/2026-03-11-zero-dep-brainstorm-server-design.md)
+- [Codex App Compatibility](docs/superpowers/specs/2026-03-23-codex-app-compatibility-design.md)
+- [Worktree Rototill](docs/superpowers/specs/2026-04-06-worktree-rototill-design.md)
 
 ## Contributing
 

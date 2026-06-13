@@ -301,3 +301,7 @@ Session transcripts are JSONL (JSON Lines) files where each line is a JSON objec
 ```
 
 The `agentId` field links to subagent sessions, and the `usage` field contains token usage for that specific subagent invocation.
+
+---
+
+[← Back to main README](../README.md) · [📋 中文版 →](zh-CN/testing.md)

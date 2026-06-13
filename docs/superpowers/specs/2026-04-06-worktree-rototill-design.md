@@ -340,3 +340,7 @@ The spec describes *what changes*; the implementation plan will specify exact ed
 
 - **Phase 3 remainder:** `$TMPDIR` directory option (#666), setup docs for caching and env inheritance (#299)
 - **Phase 4:** PreToolUse hooks for path enforcement (#1040), per-worktree env conventions (#597), brainstorming checklist worktree step (#574), multi-repo documentation (#710)
+
+---
+
+[← Back to main README](../../../README.md) · [📋 中文版 →](../../zh-CN/superpowers/specs/2026-04-06-worktree-rototill-design.md)

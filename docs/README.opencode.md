@@ -155,3 +155,7 @@ Then use the installed package path in `opencode.json`:
 - Report issues: https://github.com/obra/superpowers/issues
 - Main documentation: https://github.com/obra/superpowers
 - OpenCode docs: https://opencode.ai/docs/
+
+---
+
+[← 返回主 README](../README.md) · [📋 中文版 →](zh-CN/README.opencode.md)
